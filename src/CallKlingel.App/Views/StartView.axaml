@@ -103,9 +103,10 @@
                     <!-- Capabilities, as plain rows: no box around every line -->
                     <StackPanel Spacing="16" Margin="4,4,0,0">
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16" Classes="appear d1">
-                            <Path Grid.Column="0" Classes="icon accent" VerticalAlignment="Top"
-                                  Margin="0,2,0,0" Data="{StaticResource IconPhone}" />
-                            <StackPanel Grid.Column="1" Spacing="2">
+                            <Border Grid.Column="0" Classes="capIcon">
+                                <Path Classes="icon accent" Data="{StaticResource IconPhone}" />
+                            </Border>
+                            <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
                                 <TextBlock Classes="h2" Text="Anrufe am PC annehmen" />
                                 <TextBlock Classes="muted"
                                            Text="Eingehende Anrufe erscheinen direkt hier." />
@@ -113,9 +114,10 @@
                         </Grid>
 
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16" Classes="appear d2">
-                            <Path Grid.Column="0" Classes="icon accent" VerticalAlignment="Top"
-                                  Margin="0,2,0,0" Data="{StaticResource IconUser}" />
-                            <StackPanel Grid.Column="1" Spacing="2">
+                            <Border Grid.Column="0" Classes="capIcon">
+                                <Path Classes="icon accent" Data="{StaticResource IconUser}" />
+                            </Border>
+                            <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
                                 <TextBlock Classes="h2" Text="Namen statt Nummern" />
                                 <TextBlock Classes="muted"
                                            Text="Aus deinem lokalen Adressbuch, ohne Cloud." />
@@ -123,17 +125,58 @@
                         </Grid>
 
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16" Classes="appear d3">
-                            <Path Grid.Column="0" Classes="icon accent" VerticalAlignment="Top"
-                                  Margin="0,2,0,0" Data="{StaticResource IconSpeaker}" />
-                            <StackPanel Grid.Column="1" Spacing="2">
-                                <TextBlock Classes="h2" Text="Ton auf deinen Kopfhörern" />
+                            <Border Grid.Column="0" Classes="capIcon">
+                                <Path Classes="icon accent" Data="{StaticResource IconSpeaker}" />
+                            </Border>
+                            <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Classes="h2" Text="Ton auf deinen Kopfhörern" />
+                                    <!--
+                                        Marked, not hidden. The feature belongs on this list -
+                                        it is why the project exists - but the audio still goes
+                                        through the phone, and a line that quietly claims
+                                        otherwise is the one thing this app must not do.
+                                    -->
+                                    <Border Classes="pill" VerticalAlignment="Center">
+                                        <TextBlock Text="in Arbeit" FontSize="10"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource WarnBrush}" />
+                                    </Border>
+                                </StackPanel>
                                 <TextBlock Classes="muted"
-                                           Text="Annehmen, stummschalten, aufnehmen." />
+                                           Text="Annehmen und stummschalten geht schon. Der Ton läuft noch über das Telefon." />
                             </StackPanel>
                         </Grid>
                     </StackPanel>
 
                     <TextBlock Classes="muted" Text="{Binding ReadyHint}" Margin="4,0,0,0" />
+                </StackPanel>
+            </Grid>
+
+            <!--
+                What the product promises, as a footer. Three short claims, each one a fact
+                about how it works rather than a slogan - and each one the reason somebody
+                would choose this over the obvious alternatives.
+            -->
+            <Grid ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="30" Classes="appear d3"
+                  Margin="2,2,0,0">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="9">
+                    <Path Classes="icon sm" Stroke="{StaticResource MutedBrush}"
+                          VerticalAlignment="Center" Data="{StaticResource IconShield}" />
+                    <TextBlock Classes="muted" FontSize="12" VerticalAlignment="Center"
+                               Text="Lokal, ohne Cloud" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="9">
+                    <Path Classes="icon sm" Stroke="{StaticResource MutedBrush}"
+                          VerticalAlignment="Center" Data="{StaticResource IconBluetooth}" />
+                    <TextBlock Classes="muted" FontSize="12" VerticalAlignment="Center"
+                               Text="Ohne App auf dem Handy" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="9">
+                    <Path Classes="icon sm" Stroke="{StaticResource MutedBrush}"
+                          VerticalAlignment="Center" Data="{StaticResource IconActivity}" />
+                    <TextBlock Classes="muted" FontSize="12" VerticalAlignment="Center"
+                               Text="Deine SIM, deine Nummer" />
                 </StackPanel>
             </Grid>
 

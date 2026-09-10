@@ -319,6 +319,35 @@
         <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
     </Style>
 
+    <!--
+        Round tile behind a capability icon. A bare glyph next to a headline reads as
+        decoration; the same glyph on its own surface reads as an item in a list, and the
+        three of them line up into a column the eye can scan.
+    -->
+    <Style Selector="Border.capIcon">
+        <Setter Property="Width" Value="42" />
+        <Setter Property="Height" Value="42" />
+        <Setter Property="CornerRadius" Value="21" />
+        <Setter Property="Background" Value="{StaticResource AccentGlowBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style Selector="Border.capIcon > Path">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Width" Value="20" />
+        <Setter Property="Height" Value="20" />
+    </Style>
+
+    <!-- Small label that qualifies the text next to it: "in Arbeit", "neu", a profile name. -->
+    <Style Selector="Border.pill">
+        <Setter Property="Background" Value="{StaticResource BgRaisedBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource StrokeBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="7" />
+        <Setter Property="Padding" Value="7,2" />
+    </Style>
+
     <!-- ==============================================================
          Responsive layout
 
