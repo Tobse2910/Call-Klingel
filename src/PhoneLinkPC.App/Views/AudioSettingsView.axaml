@@ -1,0 +1,191 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PhoneLinkPC.App.ViewModels"
+             xmlns:audio="using:PhoneLinkPC.Core.Audio"
+             x:Class="PhoneLinkPC.App.Views.AudioSettingsView"
+             x:DataType="vm:AudioSettingsViewModel">
+
+    <ScrollViewer>
+        <StackPanel Margin="36,32,36,36" Spacing="20">
+
+            <StackPanel Spacing="6">
+                <TextBlock Classes="display" FontSize="26" Text="Audio" />
+                <TextBlock Classes="body"
+                           Text="Mikrofon und Lautsprecher für Gespräche wählen - und prüfen, bevor jemand anruft." />
+            </StackPanel>
+
+            <!-- Playback -->
+            <Border Classes="card">
+                <StackPanel Spacing="12">
+                    <TextBlock Classes="h2" Text="Lautsprecher / Kopfhörer" />
+                    <TextBlock Classes="muted" Text="Hier hörst du den Anrufer." />
+
+                    <ComboBox ItemsSource="{Binding PlaybackDevices}"
+                              SelectedItem="{Binding SelectedPlayback}"
+                              HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="audio:AudioDeviceInfo">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="{Binding Name}" />
+                                    <TextBlock Text="Standard" FontSize="10"
+                                               VerticalAlignment="Center"
+                                               Foreground="{StaticResource AccentBrush}"
+                                               IsVisible="{Binding IsSystemDefault}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <Button Classes="primary" HorizontalAlignment="Left"
+                            Content="Test Audio"
+                            Command="{Binding TestToneCommand}"
+                            IsEnabled="{Binding !IsTestingTone}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Capture -->
+            <Border Classes="card">
+                <StackPanel Spacing="12">
+                    <TextBlock Classes="h2" Text="Mikrofon" />
+                    <TextBlock Classes="muted" Text="Hierüber hört dich der Anrufer." />
+
+                    <ComboBox ItemsSource="{Binding CaptureDevices}"
+                              SelectedItem="{Binding SelectedCapture}"
+                              HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="audio:AudioDeviceInfo">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="{Binding Name}" />
+                                    <TextBlock Text="Standard" FontSize="10"
+                                               VerticalAlignment="Center"
+                                               Foreground="{StaticResource AccentBrush}"
+                                               IsVisible="{Binding IsSystemDefault}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                        <Button Grid.Column="0" Classes="primary"
+                                Content="Test Mikrofon"
+                                Command="{Binding TestMicrophoneCommand}" />
+
+                        <StackPanel Grid.Column="1" Spacing="5" VerticalAlignment="Center">
+                            <ProgressBar Minimum="0" Maximum="1"
+                                         Value="{Binding MicrophoneLevel}"
+                                         Height="10"
+                                         Foreground="{StaticResource PositiveBrush}"
+                                         Background="{StaticResource BgPanelBrush}" />
+                            <TextBlock Classes="muted" FontSize="11"
+                                       Text="Sprich, während der Test läuft."
+                                       IsVisible="{Binding IsTestingMicrophone}" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card"
+                    IsVisible="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <TextBlock Classes="muted" TextWrapping="Wrap" Text="{Binding Message}" />
+            </Border>
+
+            <!-- Call recording. Off by default, and never hidden while it runs. -->
+            <Border Classes="card">
+                <StackPanel Spacing="14">
+                    <TextBlock Classes="h2" Text="Gespräche aufzeichnen" />
+
+                    <Border Background="{StaticResource BgPanelBrush}"
+                            BorderBrush="{StaticResource WarnBrush}" BorderThickness="1"
+                            CornerRadius="10" Padding="14">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Rechtlicher Hinweis" FontWeight="SemiBold"
+                                       Foreground="{StaticResource WarnBrush}" />
+                            <TextBlock Classes="muted" TextWrapping="Wrap"
+                                       Text="In Deutschland ist das Aufzeichnen eines Telefonats ohne Wissen des Gegenübers nach Paragraf 201 StGB strafbar. Hole vorher das Einverständnis aller Beteiligten." />
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Classes="muted" TextWrapping="Wrap"
+                               Text="Aufnehmen kannst du jederzeit während eines Gesprächs: im Anruffenster auf den roten Punkt tippen. So kannst du erst um Einverständnis bitten und dann starten." />
+
+                    <CheckBox IsChecked="{Binding RecordCalls}"
+                              Foreground="{StaticResource TextBrush}">
+                        <TextBlock Text="Jedes Gespräch sofort automatisch aufzeichnen" />
+                    </CheckBox>
+
+                    <CheckBox IsChecked="{Binding RecordingStartTone}"
+                              Foreground="{StaticResource MutedBrush}" FontSize="12">
+                        <TextBlock Text="Hinweiston beim Start der Aufnahme" FontSize="12" />
+                    </CheckBox>
+
+                    <CheckBox IsChecked="{Binding RecordingMaskNumber}"
+                              Foreground="{StaticResource MutedBrush}" FontSize="12">
+                        <TextBlock Text="Rufnummer im Dateinamen unkenntlich machen" FontSize="12" />
+                    </CheckBox>
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Classes="muted" Text="Speicherordner" />
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="9">
+                            <TextBox Grid.Column="0" Text="{Binding RecordingFolder}" />
+                            <Button Grid.Column="1" Classes="ghost" Content="Ordner wählen"
+                                    Click="OnChooseFolder" />
+                            <Button Grid.Column="2" Classes="ghost" Content="Öffnen"
+                                    Command="{Binding OpenRecordingFolderCommand}" />
+                        </Grid>
+                    </StackPanel>
+
+                    <TextBlock Classes="muted" TextWrapping="Wrap"
+                               Text="{Binding RecordingMessage}"
+                               IsVisible="{Binding RecordingMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card">
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Grid.Column="0" Classes="h2" Text="Aufnahmen" />
+                        <Button Grid.Column="1" Classes="ghost" Content="Aktualisieren"
+                                Command="{Binding LoadExistingRecordingsCommand}" />
+                    </Grid>
+
+                    <TextBlock Classes="muted" IsVisible="{Binding !HasRecordings}"
+                               Text="Noch keine Aufnahmen im gewählten Ordner." />
+
+                    <ItemsControl ItemsSource="{Binding Recordings}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="audio:RecordingInfo">
+                                <Border Classes="tile" Margin="0,0,0,8">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <StackPanel Grid.Column="0" Spacing="3">
+                                            <TextBlock Text="{Binding FileName}" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextBrush}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Classes="mono" Text="{Binding FilePath}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" Text="{Binding SizeText}"
+                                                   Classes="muted" VerticalAlignment="Center" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card">
+                <StackPanel Spacing="10">
+                    <TextBlock Classes="h2" Text="Wie das Gesprächsaudio läuft" />
+                    <TextBlock Classes="muted" TextWrapping="Wrap"
+                               Text="Während eines Gesprächs leitet PhoneLink PC den Ton in beide Richtungen weiter: vom Telefon auf den gewählten Lautsprecher, und vom gewählten Mikrofon zurück zum Telefon." />
+                    <TextBlock Classes="muted" TextWrapping="Wrap"
+                               Text="Die Freisprech-Audiogeräte von Windows erscheinen erst, wenn ein Gespräch aktiv ist. Vorher steht in der Liste nur die normale PC-Hardware - das ist richtig so." />
+                    <Button Classes="ghost" HorizontalAlignment="Left"
+                            Content="Geräteliste aktualisieren"
+                            Command="{Binding LoadDevicesCommand}" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

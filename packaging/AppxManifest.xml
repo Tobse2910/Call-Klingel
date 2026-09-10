@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  MSIX-Manifest fuer PhoneLink PC.
+
+  Die Restricted Capability "phoneCall" ist keine Kuer, sondern Voraussetzung:
+  Ohne sie liefert PhoneLineTransportDevice.RequestAccessAsync() ein DeniedBySystem,
+  und die Anrufsteuerung ist damit unmoeglich. Nachgewiesen am 2026-09-10,
+  Details in docs/WINDOWS_TELEPHONY.md.
+
+  Sideloading genuegt - der Microsoft Store ist nicht erforderlich.
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap rescap">
+
+  <Identity
+    Name="PhoneLinkPC"
+    Publisher="CN=PhoneLinkPC-Dev"
+    Version="0.3.0.0"
+    ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>PhoneLink PC</DisplayName>
+    <PublisherDisplayName>PhoneLink PC</PublisherDisplayName>
+    <Description>Dein Handy. Auf deinem PC.</Description>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26200.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="de-DE" />
+  </Resources>
+
+  <Applications>
+    <Application Id="App" Executable="PhoneLinkPC.App.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="PhoneLink PC"
+        Description="Anrufe des Smartphones am PC annehmen, ablehnen und beenden."
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile
+          Wide310x150Logo="Assets\Wide310x150Logo.png"
+          Square71x71Logo="Assets\Square71x71Logo.png"
+          Square310x310Logo="Assets\Square310x310Logo.png" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <!-- Ohne phoneCall keine Anrufsteuerung. Siehe Kommentar oben. -->
+    <rescap:Capability Name="phoneCall" />
+    <rescap:Capability Name="phoneCallHistory" />
+    <rescap:Capability Name="phoneCallHistorySystem" />
+
+    <!-- Desktop-Bruecke fuer die Avalonia-Anwendung -->
+    <rescap:Capability Name="runFullTrust" />
+
+    <DeviceCapability Name="bluetooth" />
+    <DeviceCapability Name="microphone" />
+  </Capabilities>
+</Package>

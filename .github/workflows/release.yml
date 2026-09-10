@@ -1,0 +1,114 @@
+﻿name: Release
+
+# Builds installers for all three platforms and publishes them as one GitHub release.
+#
+# Why a workflow and not a script on the developer's machine: Velopack can only produce a
+# macOS bundle on macOS and an AppImage on Linux - a .app needs Apple's signing tools, which
+# exist nowhere else. GitHub hands out runners for all three, so a release can cover every
+# platform without owning every machine.
+#
+# Honest scope: only the Windows build can place a phone call. The Linux backend is a
+# skeleton that reports "not implemented" (milestone 6), and macOS has no backend at all.
+# The other two builds exist so the interface can be used and tested there, not because the
+# app works there.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version, z. B. 0.4.1'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      # Never cancel the other platforms because one failed: a broken macOS bundle should
+      # not throw away a Windows installer that built fine.
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+            channel: win
+          - os: ubuntu-latest
+            rid: linux-x64
+            channel: linux
+          - os: macos-latest
+            rid: osx-arm64
+            channel: osx
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Velopack-Werkzeug installieren
+        run: dotnet tool install -g vpk
+
+      - name: Tests
+        # Core only: the test project is platform neutral, and the app project cannot even
+        # be restored on a runner without the Windows SDK.
+        run: dotnet test tests/PhoneLinkPC.Core.Tests/PhoneLinkPC.Core.Tests.csproj -c Release --nologo -v q
+
+      - name: Veröffentlichen
+        run: >
+          dotnet publish src/PhoneLinkPC.App/PhoneLinkPC.App.csproj
+          -c Release
+          -r ${{ matrix.rid }}
+          --self-contained true
+          -p:Version=${{ inputs.version }}
+          -o publish
+
+      - name: Paket bauen
+        run: >
+          vpk pack
+          --packId PhoneLinkPC
+          --packVersion ${{ inputs.version }}
+          --packDir publish
+          --mainExe ${{ matrix.os == 'windows-latest' && 'PhoneLinkPC.App.exe' || 'PhoneLinkPC.App' }}
+          --packTitle "PhoneLink PC"
+          --packAuthors "Tobse2910"
+          --channel ${{ matrix.channel }}
+          --outputDir releases
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.channel }}
+          path: releases/*
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Alle Pakete einsammeln
+        run: |
+          mkdir -p releases
+          find artifacts -type f -exec cp {} releases/ \;
+          ls -la releases
+
+      - name: Release veröffentlichen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # One release holding every platform's files. The per-channel release index files
+        # sit next to each other without clashing, which is what lets an installed copy on
+        # any platform find its own updates.
+        run: |
+          gh release create "v${{ inputs.version }}" releases/* \
+            --repo "${{ github.repository }}" \
+            --title "PhoneLink PC ${{ inputs.version }}" \
+            --notes "Windows: Setup.exe herunterladen und ausführen.
+
+          Linux und macOS starten die Oberfläche, können aber noch keine Anrufe annehmen -
+          das Linux-Backend ist Meilenstein 6, für macOS gibt es noch keins."

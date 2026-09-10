@@ -1,0 +1,128 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PhoneLinkPC.App.ViewModels"
+             xmlns:models="using:PhoneLinkPC.Core.Models"
+             x:Class="PhoneLinkPC.App.Views.ContactsView"
+             x:DataType="vm:ContactsViewModel">
+
+    <ScrollViewer>
+        <StackPanel Margin="36,32,36,36" Spacing="20">
+
+            <StackPanel Spacing="6">
+                <TextBlock Classes="display" FontSize="26" Text="Kontakte" />
+                <!--
+                    Spelled out because the page was read as a sync feature: it looks like
+                    an address book, so people expect it to reach the phone in one
+                    direction or the other. It does neither, and saying so here is cheaper
+                    than the disappointment of finding out by trying.
+                -->
+                <TextBlock Classes="body"
+                           Text="Ein Adressbuch nur für diesen PC. Wenn eine gespeicherte Nummer anruft, zeigt die App den Namen statt der Rufnummer." />
+                <TextBlock Classes="muted" TextWrapping="Wrap"
+                           Text="Der Abgleich geht nur in eine Richtung: Einträge von hier erscheinen nie auf dem Handy. Umgekehrt lässt sich das Telefonbuch des Handys jederzeit hierher holen." />
+            </StackPanel>
+
+            <!--
+                The import is the primary path: typing a whole address book by hand is not
+                a real option, so it comes first and the manual entry sits below it.
+            -->
+            <Border Classes="card">
+                <StackPanel Spacing="12">
+                    <TextBlock Classes="h2" Text="Kontakte vom Handy holen" />
+                    <TextBlock Classes="muted" TextWrapping="Wrap"
+                               Text="Liest das Telefonbuch über Bluetooth. Am Telefon muss für diesen PC 'Kontakte und Anrufverlauf teilen' eingeschaltet sein." />
+                    <Button Classes="primary" Content="Telefonbuch übertragen"
+                            Padding="16,10" MinHeight="40" HorizontalAlignment="Left"
+                            IsEnabled="{Binding !IsImporting}"
+                            Command="{Binding ImportFromPhoneCommand}" />
+                    <ProgressBar IsIndeterminate="True" Height="2" CornerRadius="1"
+                                 IsVisible="{Binding IsImporting}"
+                                 Foreground="{StaticResource AccentBrush}"
+                                 Background="Transparent" />
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card">
+                <StackPanel Spacing="12">
+                    <TextBlock Classes="h2" Text="Kontakt hinzufügen" />
+                    <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="10">
+                        <TextBox Grid.Column="0" Watermark="Name" Text="{Binding NewName}" />
+                        <TextBox Grid.Column="1" Watermark="+49 176 12345678" Text="{Binding NewNumber}" />
+                        <Button Grid.Column="2" Classes="primary" Content="Speichern"
+                                Command="{Binding AddCommand}" />
+                    </Grid>
+                    <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
+                               Text="Die Nummer wird beim Anruf anhand der letzten Ziffern verglichen, damit auch 0176... zu +49176... passt." />
+
+                    <CheckBox Content="Nach dem Speichern an das Telefon senden"
+                              IsChecked="{Binding SendToPhone}" />
+                    <!--
+                        The last step belongs to the phone's user on purpose: no Bluetooth
+                        profile lets a PC write into an address book, so the app must not
+                        look like it just did.
+                    -->
+                    <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
+                               Text="Der Kontakt kommt als Datei am Telefon an. Dort einmal auf die Benachrichtigung tippen, um ihn ins Adressbuch zu übernehmen." />
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card">
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <TextBlock Grid.Column="0" Classes="h2" Text="Gespeicherte Kontakte"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" Classes="muted" Text="{Binding CountText}"
+                                   VerticalAlignment="Center" />
+                    </Grid>
+
+                    <!-- An imported phonebook is far too long to scroll through. -->
+                    <TextBox Watermark="Suchen: Name oder Nummer"
+                             Text="{Binding SearchText}" />
+
+                    <TextBlock Classes="muted" IsVisible="{Binding HasNoMatches}"
+                               Text="Kein Kontakt passt zur Suche." />
+
+                    <TextBlock Classes="muted" IsVisible="{Binding IsEmpty}"
+                               Text="Noch keine Kontakte. Ohne Kontakt zeigt die App bei einem Anruf die Rufnummer." />
+
+                    <ItemsControl ItemsSource="{Binding Contacts}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="models:Contact">
+                                <Border Classes="tile" Margin="0,0,0,8">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14">
+                                        <Border Grid.Column="0" Width="38" Height="38" CornerRadius="19"
+                                                Background="{StaticResource BgCardBrush}">
+                                            <TextBlock Text="{Binding Name[0]}" FontSize="16"
+                                                       Foreground="{StaticResource AccentBrush}"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextBrush}" />
+                                            <TextBlock Text="{Binding PhoneNumber}" Classes="muted" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                                            <Button Classes="ghost" Content="Ans Telefon"
+                                                    Command="{Binding $parent[UserControl].((vm:ContactsViewModel)DataContext).SendToPhoneCommand}"
+                                                    CommandParameter="{Binding}" />
+                                            <Button Classes="ghost" Content="Löschen"
+                                                    Command="{Binding $parent[UserControl].((vm:ContactsViewModel)DataContext).DeleteCommand}"
+                                                    CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Classes="muted" TextWrapping="Wrap" Text="{Binding Message}"
+                               IsVisible="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                    <TextBlock Classes="mono" FontSize="10" Text="{Binding StorageHint}"
+                               TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

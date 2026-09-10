@@ -1,0 +1,65 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PhoneLinkPC.App.ViewModels"
+             x:Class="PhoneLinkPC.App.Views.HistoryView"
+             x:DataType="vm:HistoryViewModel">
+
+    <ScrollViewer>
+        <StackPanel Margin="36,32,36,36" Spacing="20">
+
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Spacing="6">
+                    <TextBlock Classes="display" FontSize="26" Text="Verlauf" />
+                    <TextBlock Classes="body"
+                               Text="Wer wann angerufen hat. Nur Metadaten, niemals Gesprächsinhalte." />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="9"
+                            VerticalAlignment="Center">
+                    <Button Classes="ghost" Content="Aktualisieren" Command="{Binding LoadCommand}" />
+                    <Button Classes="ghost" Content="Verlauf löschen" Command="{Binding ClearCommand}" />
+                </StackPanel>
+            </Grid>
+
+            <Border Classes="card">
+                <StackPanel Spacing="10">
+                    <TextBlock Classes="muted" IsVisible="{Binding IsEmpty}" TextWrapping="Wrap"
+                               Text="Noch keine Anrufe aufgezeichnet. Sobald ein Gespräch über PhoneLink PC läuft, erscheint es hier." />
+
+                    <ItemsControl ItemsSource="{Binding Rows}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:HistoryRow">
+                                <Border Classes="tile" Margin="0,0,0,8">
+                                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="16">
+                                        <StackPanel Grid.Column="0" Spacing="3">
+                                            <TextBlock Text="{Binding Display}" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextBrush}" />
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="{Binding Kind}" FontSize="11"
+                                                           Foreground="{StaticResource NegativeBrush}"
+                                                           IsVisible="{Binding IsNegative}" />
+                                                <TextBlock Text="{Binding Kind}" FontSize="11"
+                                                           Foreground="{StaticResource MutedBrush}"
+                                                           IsVisible="{Binding !IsNegative}" />
+                                                <TextBlock Text="{Binding Day}" Classes="muted" FontSize="11" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" Text="{Binding Time}" Classes="mono"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="2" Text="{Binding Duration}" Classes="mono"
+                                                   VerticalAlignment="Center" MinWidth="52" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Classes="muted" Text="{Binding Message}"
+                               IsVisible="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                    <TextBlock Classes="mono" FontSize="10" Text="{Binding StorageHint}"
+                               TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

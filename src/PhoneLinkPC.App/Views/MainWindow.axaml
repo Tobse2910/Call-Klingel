@@ -1,0 +1,286 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PhoneLinkPC.App.ViewModels"
+        xmlns:views="using:PhoneLinkPC.App.Views"
+        x:Class="PhoneLinkPC.App.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="PhoneLink PC"
+        Width="1160" Height="760"
+        MinWidth="680" MinHeight="560"
+        Background="{StaticResource BgDeepBrush}"
+        Icon="avares://PhoneLinkPC.App/Assets/app.ico"
+        TransparencyLevelHint="AcrylicBlur"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1">
+
+    <Panel>
+        <ExperimentalAcrylicBorder IsHitTestVisible="False">
+            <ExperimentalAcrylicBorder.Material>
+                <ExperimentalAcrylicMaterial BackgroundSource="Digger"
+                                             TintColor="#0B0E14"
+                                             TintOpacity="1"
+                                             MaterialOpacity="0.7" />
+            </ExperimentalAcrylicBorder.Material>
+        </ExperimentalAcrylicBorder>
+
+        <Grid RowDefinitions="38,*">
+
+            <!--
+                Own title bar. The default Windows chrome is light blue and clashes with a
+                dark interface; drawing it here keeps the window one piece.
+            -->
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Background="Transparent"
+                  PointerPressed="OnTitleBarPressed" Name="TitleBar">
+                <TextBlock Grid.Column="0" Text="PhoneLink PC" FontSize="12"
+                           VerticalAlignment="Center" Margin="18,0,0,0"
+                           Foreground="{StaticResource MutedBrush}" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Classes="chrome" Click="OnMinimise" ToolTip.Tip="Minimieren"
+                            AutomationProperties.Name="Minimieren">
+                        <Path Stroke="{StaticResource TextSecondaryBrush}" StrokeThickness="1.2"
+                              Data="M 0,0 H 10" Width="10" Height="10"
+                              VerticalAlignment="Center" HorizontalAlignment="Center"
+                              Stretch="None" />
+                    </Button>
+                    <Button Classes="chrome" Click="OnMaximise" ToolTip.Tip="Maximieren"
+                            AutomationProperties.Name="Maximieren">
+                        <Border Width="9" Height="9" BorderThickness="1.2"
+                                BorderBrush="{StaticResource TextSecondaryBrush}" />
+                    </Button>
+                    <Button Classes="chrome close" Click="OnClose" ToolTip.Tip="Schliessen"
+                            AutomationProperties.Name="Schliessen">
+                        <Path Stroke="{StaticResource TextSecondaryBrush}" StrokeThickness="1.2"
+                              Data="M 0,0 L 10,10 M 10,0 L 0,10" Width="10" Height="10"
+                              VerticalAlignment="Center" HorizontalAlignment="Center"
+                              Stretch="None" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+        <!-- Auto rather than a fixed 264: the sidebar decides its own width, so a style
+             can shrink it to an icon rail on narrow windows without the grid fighting it. -->
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+
+            <!-- ===================== Navigation ===================== -->
+            <Border Grid.Column="0" Classes="sidebar appearLeft" Width="264"
+                    Background="{StaticResource GlassBrush}"
+                    BorderBrush="{StaticResource StrokeBrush}" BorderThickness="0,0,1,0">
+                <Grid RowDefinitions="Auto,*,Auto">
+
+                    <!-- Brand -->
+                    <Grid Grid.Row="0" Margin="22,14,22,20" ColumnDefinitions="Auto,*"
+                          ColumnSpacing="12">
+                        <Border Grid.Column="0" Width="38" Height="38" CornerRadius="11"
+                                Background="{StaticResource AccentGlowBrush}">
+                            <Path Classes="icon accent" Data="{StaticResource IconPhone}" />
+                        </Border>
+                        <StackPanel Grid.Column="1" Spacing="1" Classes="railHide"
+                                    VerticalAlignment="Center">
+                            <TextBlock Text="PhoneLink PC" FontSize="15" FontWeight="Bold"
+                                       Foreground="{StaticResource TextBrush}" />
+                            <TextBlock Classes="muted" FontSize="11"
+                                       Text="Dein Handy. Auf deinem PC." />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Items carry icon and label: an icon alone hurts discoverability -->
+                    <ListBox Grid.Row="1" ItemsSource="{Binding NavItems}"
+                             SelectedItem="{Binding SelectedNav}"
+                             Background="Transparent" BorderThickness="0">
+                        <ListBox.Styles>
+                            <Style Selector="ListBoxItem" x:DataType="vm:NavItem">
+                                <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
+                                <Setter Property="Padding" Value="12,10" />
+                                <Setter Property="Margin" Value="10,2" />
+                                <Setter Property="CornerRadius" Value="10" />
+                                <Setter Property="MinHeight" Value="46" />
+                            </Style>
+                        </ListBox.Styles>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:NavItem">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                    <Path Grid.Column="0" Classes="icon"
+                                          VerticalAlignment="Center"
+                                          Data="{Binding Icon}" />
+                                    <StackPanel Grid.Column="1" Spacing="1" Classes="railHide"
+                                                VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold"
+                                                   FontSize="13" />
+                                        <TextBlock Text="{Binding Subtitle}" FontSize="10"
+                                                   Foreground="{StaticResource MutedBrush}"
+                                                   TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <!-- ===================== Status ===================== -->
+                    <StackPanel Grid.Row="2" Margin="14,10,14,16" Spacing="10"
+                                Classes="railHide">
+
+                        <!-- Phone state, battery and signal, as in the design brief -->
+                        <Border Classes="tile">
+                            <StackPanel Spacing="12">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                    <Ellipse Grid.Column="0" Width="9" Height="9"
+                                             VerticalAlignment="Center"
+                                             Fill="{StaticResource PositiveBrush}"
+                                             IsVisible="{Binding IsConnected}" />
+                                    <Ellipse Grid.Column="0" Width="9" Height="9"
+                                             VerticalAlignment="Center"
+                                             Fill="{StaticResource MutedBrush}"
+                                             IsVisible="{Binding !IsConnected}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding ConnectionLabel}"
+                                               FontSize="12.5" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextBrush}"
+                                               TextTrimming="CharacterEllipsis" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9"
+                                      IsVisible="{Binding HasBattery}">
+                                    <Path Grid.Column="0" Classes="icon sm positive"
+                                          VerticalAlignment="Center"
+                                          Data="{StaticResource IconBattery}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding BatteryText}"
+                                               FontSize="12" FontWeight="SemiBold"
+                                               VerticalAlignment="Center"
+                                               ToolTip.Tip="{Binding BatteryTooltip}"
+                                               Foreground="{StaticResource PositiveBrush}" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9"
+                                      IsVisible="{Binding HasSignal}">
+                                    <Path Grid.Column="0" Classes="icon sm"
+                                          VerticalAlignment="Center"
+                                          Data="{StaticResource IconSignal}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding SignalText}"
+                                               Classes="muted" FontSize="12"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Button Classes="primary" HorizontalAlignment="Stretch"
+                                Command="{Binding ConnectPhoneCommand}"
+                                IsEnabled="{Binding !IsConnecting}"
+                                IsVisible="{Binding !IsConnected}">
+                            <StackPanel Orientation="Horizontal" Spacing="9"
+                                        HorizontalAlignment="Center">
+                                <Path Classes="icon sm onDark" Data="{StaticResource IconBluetooth}" />
+                                <TextBlock Text="Telefon verbinden" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Classes="ghost" HorizontalAlignment="Stretch"
+                                Content="Trennen"
+                                Command="{Binding DisconnectPhoneCommand}"
+                                IsVisible="{Binding IsConnected}" />
+
+                        <CheckBox IsChecked="{Binding AutoConnect}" FontSize="12">
+                            <TextBlock Text="Automatisch verbinden" FontSize="12" />
+                        </CheckBox>
+
+                        <!-- A failed connection gets an explanation, not a raw error line. -->
+                        <Border Background="{StaticResource BgPanelBrush}"
+                                BorderBrush="{StaticResource WarnBrush}" BorderThickness="1"
+                                CornerRadius="10" Padding="12,10"
+                                IsVisible="{Binding HasConnectionProblem}">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Telefon antwortet nicht" FontSize="12"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource WarnBrush}" />
+                                <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
+                                           Text="Am Telefon Bluetooth einschalten und den PC in der Bluetooth-Liste antippen. Danach verbindet sich die App von allein." />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Classes="muted" FontSize="10.5" TextWrapping="Wrap"
+                                   Text="{Binding StatusMessage}"
+                                   IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+                        <!--
+                            Update notice. Invisible unless a new version is actually
+                            waiting: an app that permanently reports "you are up to date"
+                            spends attention on a non-event.
+                        -->
+                        <Border Background="{StaticResource BgPanelBrush}"
+                                BorderBrush="{StaticResource AccentBrush}" BorderThickness="1"
+                                CornerRadius="10" Padding="12,10"
+                                IsVisible="{Binding Update.HasUpdate}">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="{Binding Update.UpdateTitle}" FontSize="12"
+                                           FontWeight="SemiBold" TextWrapping="Wrap"
+                                           Foreground="{StaticResource AccentBrush}" />
+                                <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
+                                           Text="{Binding Update.UpdateSubtitle}" />
+
+                                <ProgressBar Height="3" Minimum="0" Maximum="100"
+                                             Value="{Binding Update.Progress}"
+                                             IsVisible="{Binding Update.IsDownloading}"
+                                             Foreground="{StaticResource AccentBrush}" />
+
+                                <Button Classes="primary" HorizontalAlignment="Stretch"
+                                        Content="Herunterladen"
+                                        Command="{Binding Update.DownloadCommand}"
+                                        IsEnabled="{Binding !Update.IsBusy}" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Downloaded and waiting. The restart is the user's decision:
+                             the app closes here, and it must not do that during a call. -->
+                        <Border Background="{StaticResource BgPanelBrush}"
+                                BorderBrush="{StaticResource PositiveBrush}" BorderThickness="1"
+                                CornerRadius="10" Padding="12,10"
+                                IsVisible="{Binding Update.IsReady}">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Update bereit" FontSize="12"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource PositiveBrush}" />
+                                <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
+                                           Text="Wird beim Neustart übernommen. Nicht während eines Gesprächs." />
+                                <Button Classes="ghost" HorizontalAlignment="Stretch"
+                                        Content="Jetzt neu starten"
+                                        Command="{Binding Update.RestartCommand}" />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Classes="muted" FontSize="10.5" TextWrapping="Wrap"
+                                   Text="{Binding Update.Message}"
+                                   IsVisible="{Binding Update.Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+                        <!-- Version and a manual check, quiet at the bottom where a version
+                             number belongs. -->
+                        <Grid ColumnDefinitions="*,Auto" Margin="2,2,0,0">
+                            <TextBlock Grid.Column="0" Classes="muted" FontSize="10.5"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding Update.VersionText}" />
+                            <Button Grid.Column="1" Classes="ghost" FontSize="10.5"
+                                    Padding="8,4" MinHeight="26"
+                                    Content="Auf Updates prüfen"
+                                    IsVisible="{Binding Update.IsSupported}"
+                                    IsEnabled="{Binding !Update.IsBusy}"
+                                    Command="{Binding Update.CheckCommand}" />
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ===================== Content ===================== -->
+            <Panel Grid.Column="1" Classes="appear d1">
+                <views:StartView DataContext="{Binding Start}"
+                                 IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsStartSelected}" />
+                <views:DiagnosticsView DataContext="{Binding Diagnostics}"
+                                       IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsDiagnosticsSelected}" />
+                <views:AudioSettingsView DataContext="{Binding Audio}"
+                                         IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsAudioSelected}" />
+                <views:ContactsView DataContext="{Binding Contacts}"
+                                    IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsContactsSelected}" />
+                <views:HistoryView DataContext="{Binding History}"
+                                   IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsHistorySelected}" />
+            </Panel>
+        </Grid>
+        </Grid>
+    </Panel>
+</Window>

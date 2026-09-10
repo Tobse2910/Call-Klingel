@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <!-- The Windows build targets the Windows TFM so the WinRT telephony backend can be
+         referenced. Everywhere else the app builds against the neutral TFM. -->
+    <TargetFramework Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(PhoneLinkWindowsTfm)</TargetFramework>
+    <TargetFramework Condition="!$([MSBuild]::IsOSPlatform('Windows'))">$(PhoneLinkNeutralTfm)</TargetFramework>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::IsOSPlatform('Windows'))">10.0.18362.0</SupportedOSPlatformVersion>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.21" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.21" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.21" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.21" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.21" Condition="'$(Configuration)'=='Debug'" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Velopack" Version="1.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PhoneLinkPC.Core\PhoneLinkPC.Core.csproj" />
+    <ProjectReference Include="..\PhoneLinkPC.Infrastructure\PhoneLinkPC.Infrastructure.csproj" />
+    <ProjectReference Include="..\PhoneLinkPC.Platform.Linux\PhoneLinkPC.Platform.Linux.csproj" />
+  </ItemGroup>
+
+  <!-- The WinRT backend only exists on a Windows build host. -->
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <ProjectReference Include="..\PhoneLinkPC.Platform.Windows\PhoneLinkPC.Platform.Windows.csproj" />
+  </ItemGroup>
+</Project>

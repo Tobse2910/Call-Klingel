@@ -1,0 +1,206 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PhoneLinkPC.App.ViewModels"
+        x:Class="PhoneLinkPC.App.Views.CallWindow"
+        x:DataType="vm:CallViewModel"
+        Title="Anruf"
+        Width="400" Height="620"
+        CanResize="False"
+        ShowInTaskbar="True"
+        Topmost="True"
+        WindowStartupLocation="Manual"
+        SystemDecorations="Full"
+        Icon="avares://PhoneLinkPC.App/Assets/app.ico"
+        Background="{StaticResource BgDeepBrush}"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1">
+
+    <Grid RowDefinitions="34,*" Background="{StaticResource BgDeepBrush}">
+
+        <!-- Own title bar, so the window matches the app instead of the system theme -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Background="Transparent"
+              PointerPressed="OnTitleBarPressed">
+            <Button Grid.Column="1" Classes="chrome close" Click="OnClose"
+                    ToolTip.Tip="Fenster schliessen"
+                    AutomationProperties.Name="Fenster schliessen">
+                <Path Stroke="{StaticResource TextSecondaryBrush}" StrokeThickness="1.2"
+                      Data="M 0,0 L 10,10 M 10,0 L 0,10" Width="10" Height="10"
+                      VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="None" />
+            </Button>
+        </Grid>
+
+    <Border Grid.Row="1" Padding="28,4,28,24" Background="{StaticResource BgDeepBrush}">
+        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="18">
+
+            <!-- ===================== Header ===================== -->
+            <StackPanel Grid.Row="0" Spacing="12">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                    <Path Grid.Column="0" Classes="icon accent" VerticalAlignment="Center"
+                          Data="{StaticResource IconPhone}" />
+                    <TextBlock Grid.Column="1" Classes="h2" Text="{Binding Title}"
+                               VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" FontSize="17" FontFamily="Consolas, monospace"
+                               Foreground="{StaticResource TextBrush}"
+                               VerticalAlignment="Center"
+                               Text="{Binding DurationText}"
+                               IsVisible="{Binding IsActive}" />
+                </Grid>
+
+                <!-- Recording is never hidden while it runs -->
+                <Border Background="{StaticResource BgPanelBrush}"
+                        BorderBrush="{StaticResource NegativeBrush}" BorderThickness="1"
+                        CornerRadius="10" Padding="12,9"
+                        IsVisible="{Binding IsRecording}">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Ellipse Width="10" Height="10" VerticalAlignment="Center"
+                                 Fill="{StaticResource NegativeBrush}" />
+                        <TextBlock Text="Aufnahme läuft" FontSize="12" FontWeight="SemiBold"
+                                   Foreground="{StaticResource NegativeBrush}"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding RecordingDurationText}" Classes="mono"
+                                   FontSize="12" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
+                <!-- A simulation must never be mistaken for a real call -->
+                <Border Background="{StaticResource BgPanelBrush}"
+                        BorderBrush="{StaticResource WarnBrush}" BorderThickness="1"
+                        CornerRadius="10" Padding="12,9"
+                        IsVisible="{Binding IsSimulation}">
+                    <TextBlock FontSize="11" TextWrapping="Wrap"
+                               Foreground="{StaticResource WarnBrush}"
+                               Text="SIMULATION - nur zur Ansicht. Es wird kein echter Anruf gesteuert." />
+                </Border>
+            </StackPanel>
+
+            <!-- ===================== Caller ===================== -->
+            <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"
+                        Spacing="18">
+
+                <!-- Avatar with a soft ring, echoing the contact photo in the design -->
+                <Panel HorizontalAlignment="Center">
+                    <Ellipse Width="132" Height="132" Fill="{StaticResource AccentGlowBrush}"
+                             Opacity="0.55" />
+                    <Border Width="116" Height="116" CornerRadius="58"
+                            Background="{StaticResource BgCardBrush}"
+                            BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
+                        <TextBlock Text="{Binding Initial}" FontSize="44" FontWeight="Light"
+                                   Foreground="{StaticResource AccentBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                </Panel>
+
+                <StackPanel Spacing="6">
+                    <TextBlock Text="{Binding DisplayName}" FontSize="23" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextBrush}"
+                               HorizontalAlignment="Center" TextWrapping="Wrap"
+                               TextAlignment="Center" MaxWidth="320" />
+                    <TextBlock Text="{Binding SubTitle}" Classes="body"
+                               HorizontalAlignment="Center"
+                               IsVisible="{Binding SubTitle, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                </StackPanel>
+
+                <Border Classes="tile" Padding="14,10" HorizontalAlignment="Center"
+                        IsVisible="{Binding ActionError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <TextBlock Text="{Binding ActionError}" TextWrapping="Wrap" FontSize="12"
+                               Foreground="{StaticResource NegativeBrush}" MaxWidth="300" />
+                </Border>
+            </StackPanel>
+
+            <!-- ===================== Actions ===================== -->
+            <StackPanel Grid.Row="2" Spacing="16">
+
+                <!-- Ringing: accept or decline -->
+                <Grid ColumnDefinitions="*,*" IsVisible="{Binding IsRinging}">
+                    <StackPanel Grid.Column="0" Spacing="10" HorizontalAlignment="Center">
+                        <Button Classes="round accept" Command="{Binding AnswerCommand}"
+                                ToolTip.Tip="Anruf annehmen"
+                                AutomationProperties.Name="Anruf annehmen">
+                            <Path Classes="icon onDark lg" Data="{StaticResource IconPhone}" />
+                        </Button>
+                        <TextBlock Text="Annehmen" Classes="muted" HorizontalAlignment="Center" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Spacing="10" HorizontalAlignment="Center">
+                        <Button Classes="round decline" Command="{Binding RejectCommand}"
+                                ToolTip.Tip="Anruf ablehnen"
+                                AutomationProperties.Name="Anruf ablehnen">
+                            <Path Classes="icon onDark lg" Data="{StaticResource IconPhoneOff}" />
+                        </Button>
+                        <TextBlock Text="Ablehnen" Classes="muted" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- Active: mute, record, hang up -->
+                <Grid ColumnDefinitions="*,*,*" IsVisible="{Binding IsActive}">
+                    <StackPanel Grid.Column="0" Spacing="10" HorizontalAlignment="Center">
+                        <Button Classes="round small neutral" Command="{Binding ToggleMuteCommand}"
+                                ToolTip.Tip="Mikrofon stummschalten"
+                                AutomationProperties.Name="Mikrofon stummschalten">
+                            <Panel>
+                                <Path Classes="icon" Data="{StaticResource IconMic}"
+                                      IsVisible="{Binding !IsMuted}" />
+                                <Path Classes="icon" Stroke="{StaticResource WarnBrush}"
+                                      Data="{StaticResource IconMicOff}"
+                                      IsVisible="{Binding IsMuted}" />
+                            </Panel>
+                        </Button>
+                        <TextBlock Classes="muted" HorizontalAlignment="Center" Text="Stumm"
+                                   IsVisible="{Binding !IsMuted}" />
+                        <TextBlock HorizontalAlignment="Center" Text="Stumm an" FontSize="13"
+                                   Foreground="{StaticResource WarnBrush}"
+                                   IsVisible="{Binding IsMuted}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Spacing="10" HorizontalAlignment="Center">
+                        <Button Classes="round small neutral" Command="{Binding ToggleRecordingCommand}"
+                                ToolTip.Tip="Gespräch aufzeichnen"
+                                AutomationProperties.Name="Gespräch aufzeichnen">
+                            <Panel>
+                                <Path Classes="icon" Stroke="{StaticResource NegativeBrush}"
+                                      Fill="{StaticResource NegativeBrush}"
+                                      Data="{StaticResource IconRecord}"
+                                      IsVisible="{Binding !IsRecording}" />
+                                <Path Classes="icon" Stroke="{StaticResource NegativeBrush}"
+                                      Fill="{StaticResource NegativeBrush}"
+                                      Data="{StaticResource IconStop}"
+                                      IsVisible="{Binding IsRecording}" />
+                            </Panel>
+                        </Button>
+                        <TextBlock Classes="muted" HorizontalAlignment="Center"
+                                   Text="Aufnehmen" IsVisible="{Binding !IsRecording}" />
+                        <TextBlock HorizontalAlignment="Center" Text="Stoppen" FontSize="13"
+                                   Foreground="{StaticResource NegativeBrush}"
+                                   IsVisible="{Binding IsRecording}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Spacing="10" HorizontalAlignment="Center">
+                        <Button Classes="round decline" Command="{Binding HangupCommand}"
+                                ToolTip.Tip="Gespräch beenden"
+                                AutomationProperties.Name="Gespräch beenden">
+                            <Path Classes="icon onDark lg" Data="{StaticResource IconPhoneOff}" />
+                        </Button>
+                        <TextBlock Text="Auflegen" Classes="muted" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- Dialing: only cancel -->
+                <StackPanel Spacing="10" HorizontalAlignment="Center" IsVisible="{Binding IsDialing}">
+                    <Button Classes="round decline" Command="{Binding HangupCommand}"
+                            ToolTip.Tip="Wählen abbrechen"
+                            AutomationProperties.Name="Wählen abbrechen">
+                        <Path Classes="icon onDark lg" Data="{StaticResource IconPhoneOff}" />
+                    </Button>
+                    <TextBlock Text="Abbrechen" Classes="muted" HorizontalAlignment="Center" />
+                </StackPanel>
+
+                <TextBlock Classes="muted" FontSize="12" HorizontalAlignment="Center"
+                           TextWrapping="Wrap" TextAlignment="Center" MaxWidth="320"
+                           Text="{Binding RecordingNotice}"
+                           IsVisible="{Binding RecordingNotice, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            </StackPanel>
+        </Grid>
+    </Border>
+    </Grid>
+</Window>

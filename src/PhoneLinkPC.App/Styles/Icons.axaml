@@ -1,0 +1,51 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--
+        Vector icon set, drawn on a 24x24 grid with a 2px stroke, in the style of Lucide.
+
+        Icons are geometry, not emoji: emoji render differently on every machine, cannot be
+        recoloured by theme tokens, and change size unpredictably. One grid and one stroke
+        width keep the whole interface visually consistent.
+    -->
+
+    <!-- Navigation -->
+    <StreamGeometry x:Key="IconHome">M3 10.2 12 3l9 7.2V20a1 1 0 0 1-1 1h-4.5v-6.5h-7V21H4a1 1 0 0 1-1-1z</StreamGeometry>
+    <StreamGeometry x:Key="IconPhone">M21.5 16.9v2.8a2 2 0 0 1-2.2 2 19.6 19.6 0 0 1-8.5-3 19.3 19.3 0 0 1-6-6 19.6 19.6 0 0 1-3-8.6 2 2 0 0 1 2-2.2h2.8a2 2 0 0 1 2 1.7c.1.9.3 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.6a15.8 15.8 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.4 1.8.6 2.7.7a2 2 0 0 1 1.7 2z</StreamGeometry>
+    <StreamGeometry x:Key="IconUser">M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0z</StreamGeometry>
+    <StreamGeometry x:Key="IconClock">M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z M12 7v5l3.5 2</StreamGeometry>
+    <StreamGeometry x:Key="IconActivity">M22 12h-4l-3 9L9 3l-3 9H2</StreamGeometry>
+    <StreamGeometry x:Key="IconSpeaker">M11 5 6 9H2v6h4l5 4z M15.5 8.5a5 5 0 0 1 0 7 M18.5 5.5a9 9 0 0 1 0 13</StreamGeometry>
+
+    <!-- Status -->
+    <StreamGeometry x:Key="IconCheck">M20 6.5 9.5 17 4 11.5</StreamGeometry>
+
+    <!--
+        The check mark for the success badge, drawn to sit centred in a 24x24 box without
+        being stretched.
+
+        IconCheck above spans x 4-20 and y 6.5-17 - wider than it is tall, and off centre.
+        Stretch="Uniform" scales that to fill its box and scales the stroke with it, so the
+        line thickens, the tips run into the edge, and the whole mark reads as crooked.
+        This one is built for a fixed size instead: x 5.5-18.5 and y 7.5-17, which puts its
+        centre at 12/12.25 in a 24-wide box - the quarter pixel low is deliberate, a check
+        mark hung on its exact centre looks like it is floating.
+    -->
+    <StreamGeometry x:Key="IconCheckBadge">M5.5 12.4 L10 16.9 L18.5 7.6</StreamGeometry>
+    <StreamGeometry x:Key="IconBluetooth">M6.5 6.5 17.5 17.5 12 23V1l5.5 5.5L6.5 17.5</StreamGeometry>
+    <StreamGeometry x:Key="IconBattery">M2 8.5A1.5 1.5 0 0 1 3.5 7h12A1.5 1.5 0 0 1 17 8.5v7a1.5 1.5 0 0 1-1.5 1.5h-12A1.5 1.5 0 0 1 2 15.5z M20 10.5v3</StreamGeometry>
+    <StreamGeometry x:Key="IconSignal">M2 20h.01 M7 20v-4 M12 20v-8 M17 20V8 M22 20V4</StreamGeometry>
+    <StreamGeometry x:Key="IconShield">M12 2.5 20 6v6c0 5-3.4 8.5-8 9.5-4.6-1-8-4.5-8-9.5V6z</StreamGeometry>
+    <StreamGeometry x:Key="IconSearch">M17 17 21 21 M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0z</StreamGeometry>
+    <StreamGeometry x:Key="IconRefresh">M21 12a9 9 0 1 1-2.6-6.4 M21 3v5h-5</StreamGeometry>
+
+    <!-- Call actions -->
+    <StreamGeometry x:Key="IconMic">M12 2.5a3 3 0 0 0-3 3V12a3 3 0 0 0 6 0V5.5a3 3 0 0 0-3-3z M19 11v1a7 7 0 0 1-14 0v-1 M12 19v3</StreamGeometry>
+    <StreamGeometry x:Key="IconMicOff">M2 2 22 22 M15 5.5A3 3 0 0 0 9 5.5v3 M9 12a3 3 0 0 0 4.9 2.3 M19 11v1a7 7 0 0 1-10.9 5.8 M5 11v1a7 7 0 0 0 1.2 3.9 M12 19v3</StreamGeometry>
+    <StreamGeometry x:Key="IconKeypad">M6 6h.01 M12 6h.01 M18 6h.01 M6 12h.01 M12 12h.01 M18 12h.01 M6 18h.01 M12 18h.01 M18 18h.01</StreamGeometry>
+    <StreamGeometry x:Key="IconMore">M12 5v14 M5 12h14</StreamGeometry>
+    <StreamGeometry x:Key="IconRecord">M20 12a8 8 0 1 1-16 0 8 8 0 0 1 16 0z</StreamGeometry>
+    <StreamGeometry x:Key="IconStop">M7 7h10v10H7z</StreamGeometry>
+
+    <!-- The reject icon is the phone rotated, which is how a hang-up is drawn everywhere. -->
+    <StreamGeometry x:Key="IconPhoneOff">M10.7 13.3a15.8 15.8 0 0 1-2.7-3.7l1.3-1.3a2 2 0 0 0 .5-2.1c-.4-.9-.6-1.8-.7-2.7a2 2 0 0 0-2-1.7H4.3a2 2 0 0 0-2 2.2 19.6 19.6 0 0 0 3 8.6 M2 2 22 22 M14 14.2l1.2-1.2a2 2 0 0 1 2.1-.5c.9.4 1.8.6 2.7.7a2 2 0 0 1 1.7 2v2.8a2 2 0 0 1-2.2 2 19.6 19.6 0 0 1-8.5-3</StreamGeometry>
+</ResourceDictionary>

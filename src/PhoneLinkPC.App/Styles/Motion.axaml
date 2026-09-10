@@ -1,0 +1,199 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        Motion, kept in its own file for one reason: it can be left out entirely.
+
+        Windows lets people switch animations off, and that setting is an accessibility
+        choice, not a matter of taste. App.axaml.cs asks the system and only loads this file
+        when animations are wanted - so the app is either fully animated or completely
+        still, with no half-animated states to reason about.
+
+        Rules the animations here follow:
+          - only Opacity and transforms are animated, never width or height
+          - 150-340 ms; anything slower reads as lag rather than polish
+          - ease-out on entry, so movement decelerates into place
+          - motion carries meaning: content rises into view, the badge lands
+
+        Note on syntax: Avalonia has no animator for the RenderTransform property itself -
+        "No animator registered for the property RenderTransform" - so each style declares
+        a concrete transform and animates its members (TranslateTransform.Y, and so on).
+    -->
+
+    <!-- ==========================================================
+         Entrance: content rises into place while fading in.
+         14px of travel reads as "settling"; a longer slide reads as
+         a page that has not finished loading.
+         ========================================================== -->
+    <Style Selector=":is(Control).appear">
+        <Setter Property="RenderTransform">
+            <TranslateTransform />
+        </Setter>
+        <Style.Animations>
+            <Animation Duration="0:0:0.28" Easing="CubicEaseOut" FillMode="Forward">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0" />
+                    <Setter Property="TranslateTransform.Y" Value="14" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="1" />
+                    <Setter Property="TranslateTransform.Y" Value="0" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+    <!-- Staggered entrance, 60 ms apart: far enough that the eye reads an order,
+         close enough that the whole group has landed inside half a second. -->
+    <Style Selector=":is(Control).appear.d1">
+        <Style.Animations>
+            <Animation Duration="0:0:0.28" Delay="0:0:0.06" Easing="CubicEaseOut" FillMode="Forward">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0" />
+                    <Setter Property="TranslateTransform.Y" Value="14" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="1" />
+                    <Setter Property="TranslateTransform.Y" Value="0" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+    <Style Selector=":is(Control).appear.d2">
+        <Style.Animations>
+            <Animation Duration="0:0:0.28" Delay="0:0:0.12" Easing="CubicEaseOut" FillMode="Forward">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0" />
+                    <Setter Property="TranslateTransform.Y" Value="14" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="1" />
+                    <Setter Property="TranslateTransform.Y" Value="0" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+    <Style Selector=":is(Control).appear.d3">
+        <Style.Animations>
+            <Animation Duration="0:0:0.28" Delay="0:0:0.18" Easing="CubicEaseOut" FillMode="Forward">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0" />
+                    <Setter Property="TranslateTransform.Y" Value="14" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="1" />
+                    <Setter Property="TranslateTransform.Y" Value="0" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+    <!-- The sidebar arrives from its own edge, so the movement matches where it lives. -->
+    <Style Selector=":is(Control).appearLeft">
+        <Setter Property="RenderTransform">
+            <TranslateTransform />
+        </Setter>
+        <Style.Animations>
+            <Animation Duration="0:0:0.32" Easing="CubicEaseOut" FillMode="Forward">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0" />
+                    <Setter Property="TranslateTransform.X" Value="-22" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="1" />
+                    <Setter Property="TranslateTransform.X" Value="0" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+    <!-- ==========================================================
+         The success badge.
+
+         Driven by a class, not by IsVisible: a style animation
+         replays when its class is added, so the badge lands every
+         time the phone actually becomes ready - not only once, when
+         the window happened to be built.
+         ========================================================== -->
+    <Style Selector="Border.badge">
+        <Setter Property="RenderTransformOrigin" Value="50%,50%" />
+        <Setter Property="RenderTransform">
+            <ScaleTransform />
+        </Setter>
+    </Style>
+
+    <Style Selector="Border.badge.ready">
+        <Style.Animations>
+            <!-- BackEaseOut overshoots a little and settles, so the badge arrives instead
+                 of simply appearing. Kept short: it repeats on every reconnect. -->
+            <Animation Duration="0:0:0.34" Easing="BackEaseOut" FillMode="Forward">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0" />
+                    <Setter Property="ScaleTransform.ScaleX" Value="0.55" />
+                    <Setter Property="ScaleTransform.ScaleY" Value="0.55" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="1" />
+                    <Setter Property="ScaleTransform.ScaleX" Value="1" />
+                    <Setter Property="ScaleTransform.ScaleY" Value="1" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+    <!-- The check mark follows the circle rather than arriving with it. That short delay
+         is what makes the badge read as "confirmed" instead of as a green dot. -->
+    <Style Selector="Path.badgeMark">
+        <Setter Property="RenderTransformOrigin" Value="50%,50%" />
+        <Setter Property="RenderTransform">
+            <ScaleTransform />
+        </Setter>
+    </Style>
+
+    <Style Selector="Border.badge.ready Path.badgeMark">
+        <Style.Animations>
+            <Animation Duration="0:0:0.26" Delay="0:0:0.13" Easing="CubicEaseOut" FillMode="Forward">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0" />
+                    <Setter Property="ScaleTransform.ScaleX" Value="0.5" />
+                    <Setter Property="ScaleTransform.ScaleY" Value="0.5" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="1" />
+                    <Setter Property="ScaleTransform.ScaleX" Value="1" />
+                    <Setter Property="ScaleTransform.ScaleY" Value="1" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+    <!-- One ring that expands outward and fades, like a drop landing. It sits behind the
+         badge and never takes part in layout. -->
+    <Style Selector="Ellipse.badgePulse">
+        <Setter Property="RenderTransformOrigin" Value="50%,50%" />
+        <Setter Property="Opacity" Value="0" />
+        <Setter Property="RenderTransform">
+            <ScaleTransform />
+        </Setter>
+    </Style>
+
+    <Style Selector="Border.badge.ready Ellipse.badgePulse">
+        <Style.Animations>
+            <Animation Duration="0:0:0.75" Delay="0:0:0.10" Easing="CubicEaseOut" FillMode="Forward">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0.5" />
+                    <Setter Property="ScaleTransform.ScaleX" Value="0.75" />
+                    <Setter Property="ScaleTransform.ScaleY" Value="0.75" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="0" />
+                    <Setter Property="ScaleTransform.ScaleX" Value="1.85" />
+                    <Setter Property="ScaleTransform.ScaleY" Value="1.85" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+</Styles>
