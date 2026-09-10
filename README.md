@@ -2,6 +2,11 @@
 
 **Dein Handy. Auf deinem PC.**
 
+![Call Klingel](docs/bilder/uebersicht.png)
+
+*Gestaltungsentwurf. Die Anwendung sieht so aus, das Umfeld ist gestellt - und
+"Ton auf deinen Kopfhörern" ist noch nicht umgesetzt, siehe Meilenstein 5.*
+
 Eingehende Mobilfunkanrufe des Android-Smartphones am Windows- oder Linux-PC sehen,
 annehmen, ablehnen, beenden und stummschalten. Der PC verhält sich dabei über Bluetooth
 als Freisprecheinrichtung.
