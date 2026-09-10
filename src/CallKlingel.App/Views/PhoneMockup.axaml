@@ -1,0 +1,119 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CallKlingel.App.ViewModels"
+             x:Class="CallKlingel.App.Views.PhoneMockup"
+             x:DataType="vm:StartViewModel">
+
+    <!--
+        A drawn handset showing the phone's real state: signal, battery and clock come
+        straight from the HFP link. A product photo would be prettier but would also be a
+        stock image of someone else's device - this one is actually yours.
+    -->
+    <Panel Width="176" Height="330">
+
+        <!-- Glow behind the device, brighter while it is connected -->
+        <Ellipse Width="200" Height="240" VerticalAlignment="Center"
+                 Fill="{StaticResource AccentGlowBrush}"
+                 Opacity="{Binding DeviceGlowOpacity}" />
+
+        <!-- Metal frame -->
+        <Border Width="156" Height="316" CornerRadius="26"
+                Background="{StaticResource BgRaisedBrush}">
+            <Border.BoxShadow>0 18 40 0 #66000000</Border.BoxShadow>
+        </Border>
+
+        <!-- Inner bezel, a touch lighter so the edge catches light -->
+        <Border Width="150" Height="310" CornerRadius="24"
+                BorderThickness="1" BorderBrush="#33FFFFFF" Background="#0A0D12" />
+
+        <!-- Side buttons on the right edge -->
+        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Spacing="8"
+                    Margin="0,86,8,0">
+            <Border Width="3" Height="26" CornerRadius="2"
+                    Background="{StaticResource BgRaisedBrush}" />
+            <Border Width="3" Height="44" CornerRadius="2"
+                    Background="{StaticResource BgRaisedBrush}" />
+        </StackPanel>
+
+        <!-- Screen -->
+        <Border Width="140" Height="300" CornerRadius="20" ClipToBounds="True">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="60%,100%">
+                    <GradientStop Color="#16233F" Offset="0" />
+                    <GradientStop Color="#0E1522" Offset="0.55" />
+                    <GradientStop Color="#0B0E14" Offset="1" />
+                </LinearGradientBrush>
+            </Border.Background>
+
+            <Grid RowDefinitions="Auto,*,Auto">
+
+                <!-- Status bar, with the phone's own values -->
+                <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="5"
+                      Margin="13,11,13,0">
+                    <TextBlock Grid.Column="0" Text="{Binding ClockText}" FontSize="10.5"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource TextBrush}" />
+
+                    <!-- Signal bars, filled according to the reported strength -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="1.5"
+                                VerticalAlignment="Center">
+                        <Border Width="2.5" Height="4" CornerRadius="1" VerticalAlignment="Bottom"
+                                Background="{Binding Bar1}" />
+                        <Border Width="2.5" Height="6" CornerRadius="1" VerticalAlignment="Bottom"
+                                Background="{Binding Bar2}" />
+                        <Border Width="2.5" Height="8" CornerRadius="1" VerticalAlignment="Bottom"
+                                Background="{Binding Bar3}" />
+                        <Border Width="2.5" Height="10" CornerRadius="1" VerticalAlignment="Bottom"
+                                Background="{Binding Bar4}" />
+                    </StackPanel>
+
+                    <!-- Battery, drawn to scale -->
+                    <Panel Grid.Column="3" VerticalAlignment="Center">
+                        <Border Width="19" Height="10" CornerRadius="2.5"
+                                BorderThickness="1.2" BorderBrush="{StaticResource TextBrush}" />
+                        <!-- Hidden until the phone has reported a level: an empty cell is a
+                             claim about the battery, and "not measured" is not "empty". -->
+                        <Border Width="{Binding BatteryFillWidth}" Height="5" CornerRadius="1"
+                                HorizontalAlignment="Left" Margin="2.5,0,0,0"
+                                IsVisible="{Binding HasBatteryReading}"
+                                Background="{Binding BatteryFillBrush}" />
+                        <Border Width="1.6" Height="4" CornerRadius="1"
+                                HorizontalAlignment="Right" Margin="0,0,-2.6,0"
+                                Background="{StaticResource TextBrush}" />
+                    </Panel>
+                </Grid>
+
+                <!-- Punch-hole camera -->
+                <Ellipse Grid.Row="0" Width="7" Height="7" HorizontalAlignment="Center"
+                         VerticalAlignment="Top" Margin="0,9,0,0" Fill="#05070B" />
+
+                <!-- Wallpaper content: state of the link -->
+                <StackPanel Grid.Row="1" VerticalAlignment="Center" Spacing="14">
+                    <Panel HorizontalAlignment="Center">
+                        <Ellipse Width="58" Height="58" Fill="{StaticResource PositiveBrush}"
+                                 Opacity="0.16" IsVisible="{Binding IsPhoneReady}" />
+                        <Ellipse Width="58" Height="58" Fill="#FFFFFF" Opacity="0.05"
+                                 IsVisible="{Binding !IsPhoneReady}" />
+                        <Path Classes="icon" Width="26" Height="26"
+                              Stroke="{Binding DeviceGlyphBrush}"
+                              Data="{StaticResource IconPhone}" />
+                    </Panel>
+
+                    <StackPanel Spacing="3">
+                        <TextBlock Text="{Binding PhoneLabel}" FontSize="12.5"
+                                   FontWeight="SemiBold" HorizontalAlignment="Center"
+                                   TextAlignment="Center" TextWrapping="Wrap" MaxWidth="112"
+                                   Foreground="{StaticResource TextBrush}" />
+                        <TextBlock Text="{Binding DeviceStateText}" FontSize="10.5"
+                                   HorizontalAlignment="Center" TextAlignment="Center"
+                                   Foreground="{Binding DeviceGlyphBrush}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Home indicator -->
+                <Border Grid.Row="2" Width="46" Height="3.5" CornerRadius="2"
+                        Margin="0,0,0,9" HorizontalAlignment="Center" Background="#3AFFFFFF" />
+            </Grid>
+        </Border>
+    </Panel>
+</UserControl>

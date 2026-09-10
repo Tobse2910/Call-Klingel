@@ -1,4 +1,4 @@
-﻿# PhoneLink PC
+﻿# Call Klingel
 
 **Dein Handy. Auf deinem PC.**
 
@@ -47,9 +47,9 @@ Alle Dateien liegen unter [Releases](../../releases/latest). Aktuelle Version: *
 
 | System | Datei | Was damit geht |
 |---|---|---|
-| **Windows 10/11** | `PhoneLinkPC-win-Setup.exe` | **Alles.** Anrufe sehen, annehmen, auflegen, Kontakte |
-| **Linux** | `PhoneLinkPC-linux.AppImage` | Nur die Oberfläche - siehe Hinweis unten |
-| **macOS** | `PhoneLinkPC-osx.dmg` | Nur die Oberfläche - siehe Hinweis unten |
+| **Windows 10/11** | `CallKlingel-win-Setup.exe` | **Alles.** Anrufe sehen, annehmen, auflegen, Kontakte |
+| **Linux** | `CallKlingel-linux.AppImage` | Nur die Oberfläche - siehe Hinweis unten |
+| **macOS** | `CallKlingel-osx.dmg` | Nur die Oberfläche - siehe Hinweis unten |
 
 Es wird kein .NET benötigt: In jedem Paket steckt alles Nötige.
 
@@ -143,8 +143,8 @@ sudo apt install bluez pipewire pipewire-audio-client-libraries wireplumber libs
 
 ```bash
 git clone <repo>
-cd PhoneLinkPC
-dotnet build PhoneLinkPC.sln
+cd CallKlingel
+dotnet build CallKlingel.sln
 dotnet test
 ```
 
@@ -172,10 +172,10 @@ Ohne `-Install` wird nur gebaut und signiert.
 Starten:
 
 ```powershell
-Start-Process "shell:appsFolder\PhoneLinkPC_hjrfv1jsmn87m!App"
+Start-Process "shell:appsFolder\CallKlingel_hjrfv1jsmn87m!App"
 ```
 
-Oder über das Startmenü: **PhoneLink PC**.
+Oder über das Startmenü: **Call Klingel**.
 
 ### Voraussetzung: Sideloading
 
@@ -191,7 +191,7 @@ Windows-Einstellungen genügt.
 ### Deinstallieren
 
 ```powershell
-Get-AppxPackage -Name PhoneLinkPC | Remove-AppxPackage
+Get-AppxPackage -Name CallKlingel | Remove-AppxPackage
 ```
 
 ### Entwicklung ohne Paket
@@ -199,7 +199,7 @@ Get-AppxPackage -Name PhoneLinkPC | Remove-AppxPackage
 Für reine UI-Arbeit läuft die App auch unpackaged:
 
 ```bash
-dotnet run --project src/PhoneLinkPC.App
+dotnet run --project src/CallKlingel.App
 ```
 
 Dann sind Gerätesuche und Diagnose nutzbar, die Telefonie meldet aber
@@ -228,7 +228,7 @@ In der Anwendung: linke Navigation -> **Telefonie-Diagnose**.
 Kopflos, ohne Oberfläche:
 
 ```bash
-dotnet run --project tools/PhoneLinkPC.Diagnostics.Cli
+dotnet run --project tools/CallKlingel.Diagnostics.Cli
 ```
 
 Jede Zeile nennt den tatsächlich ausgeführten API-Aufruf und im Fehlerfall den HRESULT,
@@ -241,19 +241,19 @@ damit sich das Ergebnis von Hand nachvollziehen lässt.
 Debugausgaben aktivieren:
 
 ```bash
-dotnet run --project src/PhoneLinkPC.App -- --debug
+dotnet run --project src/CallKlingel.App -- --debug
 ```
 
 Logdateien:
 
 ```
-%LOCALAPPDATA%\PhoneLinkPC\logs\phonelink-yyyy-MM-dd.log
+%LOCALAPPDATA%\CallKlingel\logs\callklingel-yyyy-MM-dd.log
 ```
 
 Als MSIX leitet Windows das um nach:
 
 ```
-%LOCALAPPDATA%\Packages\PhoneLinkPC_hjrfv1jsmn87m\LocalCache\Local\PhoneLinkPC\logs\n```
+%LOCALAPPDATA%\Packages\CallKlingel_hjrfv1jsmn87m\LocalCache\Local\CallKlingel\logs\n```
 
 Rufnummern werden im Log grundsätzlich maskiert:
 

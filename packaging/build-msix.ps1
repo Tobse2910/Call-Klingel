@@ -1,6 +1,6 @@
-<#
+﻿<#
 .SYNOPSIS
-    Baut, signiert und installiert PhoneLink PC als MSIX-Paket.
+    Baut, signiert und installiert Call Klingel als MSIX-Paket.
 
 .DESCRIPTION
     Die App MUSS als MSIX ausgeliefert werden. Nur ein Paket kann die Restricted
@@ -29,10 +29,10 @@ $ErrorActionPreference = 'Stop'
 $repo    = Split-Path $PSScriptRoot -Parent
 $staging = Join-Path $PSScriptRoot 'app'
 $payload = Join-Path $staging 'payload'
-$msix    = Join-Path $staging 'PhoneLinkPC.msix'
-$pfx     = Join-Path $staging 'PhoneLinkPC-Dev.pfx'
-$subject = 'CN=PhoneLinkPC-Dev'
-$password = 'PhoneLinkDev!2026'
+$msix    = Join-Path $staging 'CallKlingel.msix'
+$pfx     = Join-Path $staging 'CallKlingel-Dev.pfx'
+$subject = 'CN=CallKlingel-Dev'
+$password = 'CallKlingelDev!2026'
 
 function Find-SdkTool([string]$name) {
     $root = 'C:\Program Files (x86)\Windows Kits\10\bin'
@@ -47,7 +47,7 @@ Write-Host '=== 1. Anwendung veroeffentlichen ===' -ForegroundColor Cyan
 if (Test-Path $payload) { Remove-Item -LiteralPath $payload -Recurse -Force }
 New-Item -ItemType Directory -Path $payload -Force | Out-Null
 
-& dotnet publish (Join-Path $repo 'src\PhoneLinkPC.App') `
+& dotnet publish (Join-Path $repo 'src\CallKlingel.App') `
     -c $Configuration -r win-x64 --self-contained false `
     -o $payload --nologo -v minimal
 if ($LASTEXITCODE -ne 0) { throw 'dotnet publish fehlgeschlagen.' }
@@ -70,7 +70,7 @@ $cert = Get-ChildItem Cert:\CurrentUser\My -ErrorAction SilentlyContinue |
         Where-Object { $_.Subject -eq $subject } | Select-Object -First 1
 if (-not $cert) {
     $cert = New-SelfSignedCertificate -Type Custom -Subject $subject `
-              -KeyUsage DigitalSignature -FriendlyName 'PhoneLink PC Testzertifikat' `
+              -KeyUsage DigitalSignature -FriendlyName 'Call Klingel Testzertifikat' `
               -CertStoreLocation 'Cert:\CurrentUser\My' `
               -TextExtension @('2.5.29.37={text}1.3.6.1.5.5.7.3.3',
                                '2.5.29.19={text}Subject Type:End Entity') `
@@ -100,11 +100,11 @@ $admin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 if (-not $admin) { throw 'Fuer -Install werden Administratorrechte benoetigt (Zertifikatsimport).' }
 
 Import-PfxCertificate -FilePath $pfx -CertStoreLocation 'Cert:\LocalMachine\TrustedPeople' -Password $secure | Out-Null
-Get-AppxPackage -Name 'PhoneLinkPC' -ErrorAction SilentlyContinue |
+Get-AppxPackage -Name 'CallKlingel' -ErrorAction SilentlyContinue |
     ForEach-Object { Remove-AppxPackage $_.PackageFullName -ErrorAction SilentlyContinue }
 Add-AppxPackage -Path $msix
 
-$pkg = Get-AppxPackage -Name 'PhoneLinkPC'
+$pkg = Get-AppxPackage -Name 'CallKlingel'
 Write-Host ''
 Write-Host 'Installiert:' -ForegroundColor Green
 Write-Host "  $($pkg.PackageFullName)"

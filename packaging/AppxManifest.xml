@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-  MSIX-Manifest fuer PhoneLink PC.
+  MSIX-Manifest fuer Call Klingel.
 
   Die Restricted Capability "phoneCall" ist keine Kuer, sondern Voraussetzung:
   Ohne sie liefert PhoneLineTransportDevice.RequestAccessAsync() ein DeniedBySystem,
@@ -16,14 +16,14 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="PhoneLinkPC"
-    Publisher="CN=PhoneLinkPC-Dev"
+    Name="CallKlingel"
+    Publisher="CN=CallKlingel-Dev"
     Version="0.3.0.0"
     ProcessorArchitecture="x64" />
 
   <Properties>
-    <DisplayName>PhoneLink PC</DisplayName>
-    <PublisherDisplayName>PhoneLink PC</PublisherDisplayName>
+    <DisplayName>Call Klingel</DisplayName>
+    <PublisherDisplayName>Call Klingel</PublisherDisplayName>
     <Description>Dein Handy. Auf deinem PC.</Description>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -37,9 +37,9 @@
   </Resources>
 
   <Applications>
-    <Application Id="App" Executable="PhoneLinkPC.App.exe" EntryPoint="Windows.FullTrustApplication">
+    <Application Id="App" Executable="CallKlingel.App.exe" EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements
-        DisplayName="PhoneLink PC"
+        DisplayName="Call Klingel"
         Description="Anrufe des Smartphones am PC annehmen, ablehnen und beenden."
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"

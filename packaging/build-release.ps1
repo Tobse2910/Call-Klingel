@@ -1,11 +1,11 @@
 ﻿<#
 .SYNOPSIS
-    Builds an installable PhoneLink PC release and, on request, publishes it to GitHub.
+    Builds an installable Call Klingel release and, on request, publishes it to GitHub.
 
 .DESCRIPTION
     Produces three things in packaging\releases:
 
-      PhoneLinkPC-win-Setup.exe   the installer you hand to a person
+      CallKlingel-win-Setup.exe   the installer you hand to a person
       *-full.nupkg                the payload the app downloads when updating
       RELEASES-win.json           the index the app reads to notice a new version
 
@@ -39,16 +39,16 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $root      = Split-Path $PSScriptRoot
-$project   = Join-Path $root 'src\PhoneLinkPC.App\PhoneLinkPC.App.csproj'
+$project   = Join-Path $root 'src\CallKlingel.App\CallKlingel.App.csproj'
 $publishTo = Join-Path $PSScriptRoot 'publish'
 $releases  = Join-Path $PSScriptRoot 'releases'
-$icon      = Join-Path $root 'src\PhoneLinkPC.App\Assets\app.ico'
+$icon      = Join-Path $root 'src\CallKlingel.App\Assets\app.ico'
 
 # The repository the app checks for updates, read out of the source rather than repeated
 # here. Two copies of this address would eventually disagree, and the failure is silent:
 # releases land in one place while every installed copy looks in the other, so nobody ever
 # sees an update and nothing reports an error.
-$serviceFile = Join-Path $root 'src\PhoneLinkPC.App\Services\VelopackUpdateService.cs'
+$serviceFile = Join-Path $root 'src\CallKlingel.App\Services\VelopackUpdateService.cs'
 $match = Select-String -Path $serviceFile -Pattern 'ReleaseUrl\s*=\s*"([^"]+)"'
 if (-not $match) { throw "ReleaseUrl nicht in $serviceFile gefunden." }
 $repoUrl = $match.Matches[0].Groups[1].Value
@@ -81,7 +81,7 @@ Step 'Icons erzeugen'
 # --- Tests -----------------------------------------------------------------------
 # A release that ships without running the tests is a release nobody checked.
 Step 'Tests'
-dotnet test (Join-Path $root 'PhoneLinkPC.sln') -c Release --nologo -v q
+dotnet test (Join-Path $root 'CallKlingel.sln') -c Release --nologo -v q
 if ($LASTEXITCODE -ne 0) { throw "Tests fehlgeschlagen - kein Release." }
 
 # --- Publish -------------------------------------------------------------------
@@ -107,11 +107,11 @@ New-Item -ItemType Directory -Path $releases -Force | Out-Null
 
 $vpkArgs = @(
     'pack',
-    '--packId', 'PhoneLinkPC',
+    '--packId', 'CallKlingel',
     '--packVersion', $Version,
     '--packDir', $publishTo,
-    '--mainExe', 'PhoneLinkPC.App.exe',
-    '--packTitle', 'PhoneLink PC',
+    '--mainExe', 'CallKlingel.App.exe',
+    '--packTitle', 'Call Klingel',
     '--packAuthors', 'Tobse2910',
     '--outputDir', $releases
 )
@@ -145,7 +145,7 @@ $repo = ($repoUrl -replace '^https://github\.com/', '')
 vpk upload github `
     --repoUrl $repoUrl `
     --publish `
-    --releaseName "PhoneLink PC $Version" `
+    --releaseName "Call Klingel $Version" `
     --tag "v$Version" `
     --outputDir $releases
 if ($LASTEXITCODE -ne 0) { throw "Upload fehlgeschlagen." }

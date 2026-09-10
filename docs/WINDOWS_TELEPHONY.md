@@ -7,7 +7,7 @@ Dokumentation abgeschrieben. Messdatum: 2026-09-10, Windows 11 Pro Build 10.0.26
 Reproduzierbar mit:
 
 ```
-dotnet run --project tools/PhoneLinkPC.Diagnostics.Cli
+dotnet run --project tools/CallKlingel.Diagnostics.Cli
 ```
 
 ---
@@ -103,7 +103,7 @@ Ereignisse: `StatusChanged`, `IsMutedChanged`, `AudioDeviceChanged`.
 
 Abbildung auf den abstrakten `CallState` der Anwendung:
 
-| Windows | PhoneLink |
+| Windows | CallKlingel |
 |---|---|
 | `Incoming` | `Ringing` |
 | `Dialing` | `Dialing` |
@@ -328,7 +328,7 @@ Protokollcode wurde zuletzt geprüft statt zuerst.
 
 ### Warum das die bessere Architektur ist
 
-Der Code liegt in `PhoneLinkPC.Core/Hfp/`, nicht im Windows-Projekt. Nur der Transport ist
+Der Code liegt in `CallKlingel.Core/Hfp/`, nicht im Windows-Projekt. Nur der Transport ist
 plattformabhängig: ein RFCOMM-Socket unter Windows, ein BlueZ-Dateideskriptor unter Linux.
 Damit bedient eine Protokollimplementierung beide Plattformen - der Linux-Meilenstein wird
 dadurch kleiner statt grösser.

@@ -1,0 +1,169 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CallKlingel.App.ViewModels"
+             xmlns:diag="using:CallKlingel.Core.Diagnostics"
+             xmlns:conv="using:CallKlingel.App.Converters"
+             x:Class="CallKlingel.App.Views.DiagnosticsView"
+             x:DataType="vm:DiagnosticsViewModel">
+
+    <UserControl.Resources>
+        <conv:DiagnosticStatusToBrushConverter x:Key="StatusBrush" />
+        <conv:DiagnosticStatusToGlyphConverter x:Key="StatusGlyph" />
+    </UserControl.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <StackPanel Grid.Row="0" Margin="34,30,34,16" Spacing="16">
+            <StackPanel Spacing="6">
+                <TextBlock Classes="display" FontSize="26" Text="Telefonie-Diagnose" />
+                <TextBlock Classes="body" TextWrapping="Wrap"
+                           Text="Jede Zeile ist das Ergebnis eines echten API-Aufrufs. Fehler erscheinen mit HRESULT, damit sie nachvollziehbar bleiben." />
+            </StackPanel>
+
+            <!--
+                One button, not four. The full diagnosis runs everything the other three do,
+                and their names - "Capabilities", "Telefonleitungen" - are Windows API terms
+                that mean nothing to the person using the app.
+
+                "Telefonleitungen suchen" is the worst of them: it queries PhoneLineWatcher,
+                the API this project measured as dead for third-party apps. It reports zero
+                lines no matter how well everything works. A button that measures a dead end
+                and turns red while the app is running perfectly.
+
+                They stay, folded away, because they isolate a single step each - which is
+                what makes them worth having when something actually breaks.
+            -->
+            <Button Classes="primary" Content="Vollständige Diagnose"
+                    HorizontalAlignment="Left"
+                    Command="{Binding RunFullCommand}" IsEnabled="{Binding !IsRunning}" />
+
+            <Expander Header="Einzelne Prüfungen für die Fehlersuche"
+                      HorizontalAlignment="Stretch">
+                <StackPanel Spacing="12" Margin="0,10,0,2">
+                    <TextBlock Classes="muted" TextWrapping="Wrap"
+                               Text="Jede Schaltfläche ruft genau eine Schnittstelle auf. Nur nötig, wenn eine einzelne Stufe eingegrenzt werden soll." />
+                    <WrapPanel ItemSpacing="10" LineSpacing="10">
+                        <Button Classes="ghost" Content="Verbindung testen"
+                                Command="{Binding TestConnectionCommand}"
+                                IsEnabled="{Binding !IsRunning}" />
+                        <Button Classes="ghost" Content="Berechtigungen prüfen"
+                                Command="{Binding CheckCapabilitiesCommand}"
+                                IsEnabled="{Binding !IsRunning}" />
+                        <Button Classes="ghost" Content="Telefonleitungen suchen"
+                                ToolTip.Tip="Prüft die Windows-Telefonie-Schnittstelle. Sie meldet immer null Leitungen - die App nutzt sie nicht."
+                                Command="{Binding FindPhoneLinesCommand}"
+                                IsEnabled="{Binding !IsRunning}" />
+                    </WrapPanel>
+                </StackPanel>
+            </Expander>
+
+            <Border Background="{StaticResource BgPanelBrush}"
+                    BorderBrush="{StaticResource WarnBrush}" BorderThickness="1"
+                    CornerRadius="12" Padding="18">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14">
+                    <Path Grid.Column="0" Classes="icon" Stroke="{StaticResource WarnBrush}"
+                          VerticalAlignment="Center" Data="{StaticResource IconPhone}" />
+                    <StackPanel Grid.Column="1" Spacing="4">
+                        <TextBlock Text="Anruf simulieren" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextBrush}" />
+                        <TextBlock Classes="muted" TextWrapping="Wrap"
+                                   Text="Zeigt das Anruffenster, ohne dass jemand anruft. Reine Ansicht - es wird kein echtes Gespräch gesteuert." />
+                    </StackPanel>
+                    <Button Grid.Column="2" Classes="ghost" VerticalAlignment="Center"
+                            Content="Testanruf anzeigen"
+                            Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SimulateCallCommand}" />
+                </Grid>
+            </Border>
+
+            <ProgressBar IsIndeterminate="True" Height="3"
+                         IsVisible="{Binding IsRunning}"
+                         Foreground="{StaticResource AccentBrush}" />
+
+            <TextBlock Classes="muted" Text="{Binding Summary}" TextWrapping="Wrap" />
+
+            <!-- Live protocol view: the only way to see that the phone really answers. -->
+            <Border Classes="card">
+                <StackPanel Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="3">
+                            <TextBlock Classes="h2" Text="Live-Protokoll" />
+                            <TextBlock Classes="muted" TextWrapping="Wrap"
+                                       Text="Zeigt in Echtzeit, was PC und Telefon austauschen. Test ohne zweites Handy: am Telefon eine Nummer wählen, grünen Hörer drücken und nach einer Sekunde auflegen. Kostet nichts - hier muss sofort etwas erscheinen." />
+                        </StackPanel>
+                        <Button Grid.Column="1" Classes="ghost" Content="Leeren"
+                                VerticalAlignment="Center"
+                                Command="{Binding ClearTraceCommand}" />
+                    </Grid>
+
+                    <TextBlock Classes="muted" IsVisible="{Binding !HasTrace}"
+                               Text="Noch keine Ereignisse. Verbinde zuerst das Telefon." />
+
+                    <Border Background="{StaticResource BgDeepBrush}" CornerRadius="8"
+                            Padding="12" MaxHeight="240"
+                            IsVisible="{Binding HasTrace}">
+                        <ScrollViewer>
+                            <ItemsControl ItemsSource="{Binding ProtocolLines}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Classes="mono" FontSize="11" Text="{Binding}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" Margin="34,0,34,24">
+            <ItemsControl ItemsSource="{Binding Groups}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:DiagnosticGroup">
+                        <StackPanel Spacing="8" Margin="0,0,0,22">
+                            <TextBlock Classes="h2" Text="{Binding Name}" />
+
+                            <ItemsControl ItemsSource="{Binding Checks}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="diag:DiagnosticCheck">
+                                        <Border Background="{StaticResource BgCardBrush}"
+                                                BorderBrush="{StaticResource StrokeBrush}"
+                                                BorderThickness="1" CornerRadius="12"
+                                                Padding="16" Margin="0,0,0,8">
+                                            <StackPanel Spacing="6">
+                                                <Grid ColumnDefinitions="86,*,Auto">
+                                                    <Border Grid.Column="0" CornerRadius="5" Padding="6,3"
+                                                            HorizontalAlignment="Left"
+                                                            Background="{StaticResource BgPanelBrush}">
+                                                        <TextBlock FontSize="10" FontWeight="Bold"
+                                                                   Text="{Binding Status, Converter={StaticResource StatusGlyph}}"
+                                                                   Foreground="{Binding Status, Converter={StaticResource StatusBrush}}" />
+                                                    </Border>
+
+                                                    <TextBlock Grid.Column="1" Margin="10,0,0,0"
+                                                               Text="{Binding Name}"
+                                                               Foreground="{StaticResource TextBrush}"
+                                                               TextWrapping="Wrap" />
+
+                                                    <TextBlock Grid.Column="2"
+                                                               Text="{Binding Value}"
+                                                               Foreground="{Binding Status, Converter={StaticResource StatusBrush}}"
+                                                               FontWeight="SemiBold" />
+                                                </Grid>
+
+                                                <TextBlock Classes="mono" Text="{Binding Probe}" TextWrapping="Wrap"
+                                                           IsVisible="{Binding Probe, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+                                                <TextBlock Classes="mono" Text="{Binding Detail}" TextWrapping="Wrap"
+                                                           IsVisible="{Binding Detail, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

@@ -1,8 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>$(PhoneLinkNeutralTfm)</TargetFramework>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PhoneLinkPC.Core\PhoneLinkPC.Core.csproj" />
-  </ItemGroup>
-</Project>

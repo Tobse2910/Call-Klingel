@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- WinRT projections only exist on Windows. On Linux this project still compiles
+         (as a neutral stub) so the whole solution stays buildable on both platforms. -->
+    <TargetFramework Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(CallKlingelWindowsTfm)</TargetFramework>
+    <TargetFramework Condition="!$([MSBuild]::IsOSPlatform('Windows'))">$(CallKlingelNeutralTfm)</TargetFramework>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::IsOSPlatform('Windows'))">10.0.18362.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CallKlingel.Core\CallKlingel.Core.csproj" />
+  </ItemGroup>
+
+  <!-- WASAPI is needed to bridge the call audio between the phone and the PC devices. -->
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <PackageReference Include="NAudio.Wasapi" Version="2.2.1" />
+    <PackageReference Include="NAudio.Core" Version="2.2.1" />
+  </ItemGroup>
+
+  <!-- WinRT-dependent sources are excluded when building on a non-Windows host. -->
+  <ItemGroup Condition="!$([MSBuild]::IsOSPlatform('Windows'))">
+    <Compile Remove="WinRt\**\*.cs" />
+  </ItemGroup>
+</Project>

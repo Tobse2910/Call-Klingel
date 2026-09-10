@@ -3,11 +3,11 @@
 ## Schichtenmodell
 
 ```
-                    PhoneLink PC
+                    Call Klingel
                          |
-                  Avalonia Oberfläche          PhoneLinkPC.App
+                  Avalonia Oberfläche          CallKlingel.App
                          |
-                 Telephony Interface            PhoneLinkPC.Core
+                 Telephony Interface            CallKlingel.Core
                          |
              +-----------+-----------+
              |                       |
@@ -34,13 +34,13 @@ keinen SIP-Anbieter und keine Cloud.
 
 | Projekt | Zielframework | Inhalt |
 |---|---|---|
-| `PhoneLinkPC.Core` | `net9.0` | Modelle, `ITelephonyService`, Zustände, Nummernmaskierung |
-| `PhoneLinkPC.Infrastructure` | `net9.0` | Logging, Backend-Auswahl |
-| `PhoneLinkPC.Platform.Windows` | `net9.0-windows10.0.26100.0` | WinRT-Telefonie |
-| `PhoneLinkPC.Platform.Linux` | `net9.0` | BlueZ / PipeWire (Meilenstein 6) |
-| `PhoneLinkPC.App` | plattformabhängig | Avalonia-Oberfläche |
-| `PhoneLinkPC.Diagnostics.Cli` | plattformabhängig | Kopflose Diagnose |
-| `PhoneLinkPC.Core.Tests` | `net9.0` | Unit-Tests |
+| `CallKlingel.Core` | `net9.0` | Modelle, `ITelephonyService`, Zustände, Nummernmaskierung |
+| `CallKlingel.Infrastructure` | `net9.0` | Logging, Backend-Auswahl |
+| `CallKlingel.Platform.Windows` | `net9.0-windows10.0.26100.0` | WinRT-Telefonie |
+| `CallKlingel.Platform.Linux` | `net9.0` | BlueZ / PipeWire (Meilenstein 6) |
+| `CallKlingel.App` | plattformabhängig | Avalonia-Oberfläche |
+| `CallKlingel.Diagnostics.Cli` | plattformabhängig | Kopflose Diagnose |
+| `CallKlingel.Core.Tests` | `net9.0` | Unit-Tests |
 
 ### Warum das Zielframework bedingt gesetzt ist
 
@@ -52,7 +52,7 @@ ihr Zielframework darum über eine MSBuild-Bedingung:
 <TargetFramework Condition="!$([MSBuild]::IsOSPlatform('Windows'))">net9.0</TargetFramework>
 ```
 
-Damit bleibt `dotnet build PhoneLinkPC.sln` auf beiden Plattformen lauffähig. Unter Linux
+Damit bleibt `dotnet build CallKlingel.sln` auf beiden Plattformen lauffähig. Unter Linux
 werden die WinRT-Quellen aus `WinRt/` per `<Compile Remove>` ausgeschlossen.
 
 ## Die Abstraktionsgrenze

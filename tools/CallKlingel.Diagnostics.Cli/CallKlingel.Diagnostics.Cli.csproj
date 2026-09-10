@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(CallKlingelWindowsTfm)</TargetFramework>
+    <TargetFramework Condition="!$([MSBuild]::IsOSPlatform('Windows'))">$(CallKlingelNeutralTfm)</TargetFramework>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::IsOSPlatform('Windows'))">10.0.18362.0</SupportedOSPlatformVersion>
+    <AssemblyName>callklingel-diagnose</AssemblyName>
+    <RootNamespace>CallKlingel.Diagnostics.Cli</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\CallKlingel.Core\CallKlingel.Core.csproj" />
+    <ProjectReference Include="..\..\src\CallKlingel.Infrastructure\CallKlingel.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\CallKlingel.Platform.Linux\CallKlingel.Platform.Linux.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <ProjectReference Include="..\..\src\CallKlingel.Platform.Windows\CallKlingel.Platform.Windows.csproj" />
+  </ItemGroup>
+</Project>

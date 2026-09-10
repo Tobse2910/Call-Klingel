@@ -56,11 +56,11 @@ jobs:
       - name: Tests
         # Core only: the test project is platform neutral, and the app project cannot even
         # be restored on a runner without the Windows SDK.
-        run: dotnet test tests/PhoneLinkPC.Core.Tests/PhoneLinkPC.Core.Tests.csproj -c Release --nologo -v q
+        run: dotnet test tests/CallKlingel.Core.Tests/CallKlingel.Core.Tests.csproj -c Release --nologo -v q
 
       - name: Veröffentlichen
         run: >
-          dotnet publish src/PhoneLinkPC.App/PhoneLinkPC.App.csproj
+          dotnet publish src/CallKlingel.App/CallKlingel.App.csproj
           -c Release
           -r ${{ matrix.rid }}
           --self-contained true
@@ -70,11 +70,11 @@ jobs:
       - name: Paket bauen
         run: >
           vpk pack
-          --packId PhoneLinkPC
+          --packId CallKlingel
           --packVersion ${{ inputs.version }}
           --packDir publish
-          --mainExe ${{ matrix.os == 'windows-latest' && 'PhoneLinkPC.App.exe' || 'PhoneLinkPC.App' }}
-          --packTitle "PhoneLink PC"
+          --mainExe ${{ matrix.os == 'windows-latest' && 'CallKlingel.App.exe' || 'CallKlingel.App' }}
+          --packTitle "Call Klingel"
           --packAuthors "Tobse2910"
           --channel ${{ matrix.channel }}
           --outputDir releases
@@ -107,7 +107,7 @@ jobs:
         run: |
           gh release create "v${{ inputs.version }}" releases/* \
             --repo "${{ github.repository }}" \
-            --title "PhoneLink PC ${{ inputs.version }}" \
+            --title "Call Klingel ${{ inputs.version }}" \
             --notes "Windows: Setup.exe herunterladen und ausführen.
 
           Linux und macOS starten die Oberfläche, können aber noch keine Anrufe annehmen -

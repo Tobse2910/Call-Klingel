@@ -1,0 +1,11 @@
+﻿<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CallKlingel.App.App"
+             RequestedThemeVariant="Dark">
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://CallKlingel.App/Styles/Theme.axaml" />
+        <!-- Removed again at startup when the system asks for reduced motion; see App.axaml.cs -->
+        <StyleInclude Source="avares://CallKlingel.App/Styles/Motion.axaml" />
+    </Application.Styles>
+</Application>

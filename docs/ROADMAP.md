@@ -20,7 +20,7 @@ Nachweis: App startet, Fenster reagiert, Gerätesuche läuft über den echten Ba
 
 - [x] Diagnoseseite mit Betriebssystem, Bluetooth, HFP, Leitungen, Audio
 - [x] Schaltflächen: Test Verbindung, Capabilities prüfen, Telefonleitungen suchen
-- [x] Kopflose Variante `phonelink-diagnose`
+- [x] Kopflose Variante `callklingel-diagnose`
 - [x] Nachgewiesen: Telefonie-APIs funktionieren ohne MSIX
 
 Ergebnis siehe `WINDOWS_TELEPHONY.md`. Offen bleibt `RequestAccessAsync()`, weil dafür

@@ -1,6 +1,6 @@
-<#
+﻿<#
 .SYNOPSIS
-    Draws the PhoneLink PC app icon at every size Windows asks for.
+    Draws the Call Klingel app icon at every size Windows asks for.
 
 .DESCRIPTION
     The mark is a handset sitting inside a monitor outline: a phone call living on the PC's
@@ -216,11 +216,11 @@ foreach ($img in $images) { $bw.Write($img) }
 $bw.Flush(); $bw.Dispose(); $fs.Dispose()
 
 # The app project keeps its own copy, so a plain build has the icon too.
-$appAssets = Join-Path (Split-Path $PSScriptRoot) 'src\PhoneLinkPC.App\Assets'
+$appAssets = Join-Path (Split-Path $PSScriptRoot) 'src\CallKlingel.App\Assets'
 if (Test-Path $appAssets) {
     Get-ChildItem $OutDir -Filter *.png | Copy-Item -Destination $appAssets -Force
     Copy-Item $icoPath (Join-Path $appAssets 'app.ico') -Force
-    Write-Host "Icons auch nach src\PhoneLinkPC.App\Assets kopiert" -ForegroundColor DarkGray
+    Write-Host "Icons auch nach src\CallKlingel.App\Assets kopiert" -ForegroundColor DarkGray
 }
 
 Write-Host "Icons erzeugt in $OutDir" -ForegroundColor Green
