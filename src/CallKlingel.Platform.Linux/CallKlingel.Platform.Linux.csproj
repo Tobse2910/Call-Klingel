@@ -5,4 +5,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CallKlingel.Core\CallKlingel.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Tmds.DBus.Protocol" Version="0.95.1" />
+  </ItemGroup>
 </Project>
